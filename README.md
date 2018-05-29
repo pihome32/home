@@ -1,4 +1,4 @@
 
-#Install
-##Sensor PI
+# Install
+## Sensor PI
 1. Install Hypriot
