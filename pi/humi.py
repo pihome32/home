@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
+import time
+
 
 HOST = "localhost"
 PORT = 4223
@@ -14,9 +17,17 @@ if __name__ == "__main__":
 
     ipcon.connect(HOST, PORT) # Connect to brickd
     # Don't use device before ipcon is connected
-
+    h.set_status_led_config(1)
     # Get current humidity
     humidity = h.get_humidity()
     temperature = h.get_temperature()
-    print(str(humidity) + '/' + str(temperature))
+    out={'humidity':humidity , 'temperature': temperature}
+    print(json.dumps(out))
+    time.sleep(0.05)
+    h.set_status_led_config(0)
+    time.sleep(0.05)
+    h.set_status_led_config(1)
+    time.sleep(0.05)
+    h.set_status_led_config(0)
+
 
