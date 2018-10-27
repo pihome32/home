@@ -9,7 +9,7 @@
   </code>
 3. Node red
 4. Inluxdb + chronograf
-https://blog.blaisot.org/raspi-timeseries-tick-stack.html
+(https://blog.blaisot.org/raspi-timeseries-tick-stack.html)
 
 
   
