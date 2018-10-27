@@ -1,17 +1,15 @@
 
 # Install
-## Sensor PI
-1. Install Hypriot
-2. Docker portainer
+## Raspberry
+1. Install raspbian
+2. Tinkerforge daemon
 <code>
+  wget http://download.tinkerforge.com/tools/brickd/linux/brickd_linux_latest_armhf.deb
+  sudo dpkg -i brickd_linux_latest_armhf.deb
   </code>
-3. Docker grafana
-<code>
-  docker run \
-  -d \
-  -p 3000:3000 \
-  --name=grafana \
-  -v /home/pirate/grafana:/var/lib/grafana \
-  fg2it/grafana-armhf:v4.1.2
-</code>
+3. Node red
+4. Inluxdb + chronograf
+https://blog.blaisot.org/raspi-timeseries-tick-stack.html
+
+
   
