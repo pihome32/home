@@ -1,28 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from influxdb import InfluxDBClient
-
-
-HOST = "localhost"
-PORT = 4223
-loop = 10
-
 import time
+import os
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.brick_master import BrickMaster
 from tinkerforge.bricklet_humidity_v2 import BrickletHumidityV2
 
+# turn on the green LED
+os.system("sudo bash -c \"echo 0 > /sys/class/leds/led0/brightness\"")
+os.system("sudo bash -c \"echo 0 > /sys/class/leds/led1/brightness\"")
 
-UID = "62fTXQ" # Change XXYYZZ to the UID of your Master Brick
+HOST = "localhost"
+PORT = 4223
+loop = 10
 
-from tinkerforge.ip_connection import IPConnection
-from tinkerforge.brick_master import BrickMaster
+masterUID = "62fTXQ" # Change XXYYZZ to the UID of your Master Brick
+humiUID = "DeD"
+
+dbname = 'home'
+user = ''
+password = ''
+host='localhost'
+port=8086
+
+tempComp = -2
 
 ##Inititalisation
 if __name__ == "__main__":
     ipcon = IPConnection() # Create IP connection
-    master = BrickMaster(UID, ipcon) # Create device object
+    master = BrickMaster(masterUID, ipcon) # Create device object
 
     ipcon.connect(HOST, PORT) # Connect to brickd
     # Don't use device before ipcon is connected
@@ -31,12 +39,10 @@ if __name__ == "__main__":
 
     ipcon.disconnect()
 
-UID = "DeD"
-from tinkerforge.bricklet_humidity_v2 import BrickletHumidityV2
 
 if __name__ == "__main__":
     ipcon = IPConnection() # Create IP connection
-    h = BrickletHumidityV2(UID, ipcon) # Create device object
+    h = BrickletHumidityV2(humiUID, ipcon) # Create device object
 
     ipcon.connect(HOST, PORT) # Connect to brickd
 
@@ -44,26 +50,13 @@ if __name__ == "__main__":
     ipcon.disconnect()	
 
 #####################################
-dbname = 'home'
-user = ''
-password = ''
-host='localhost'
-port=8086
 
-
+humi = 0
 # Callback function for humidity callback
 def cb_humidity(humidity):
-    client = InfluxDBClient(host, port, user, password, dbname)
-    json_body = [
-        {
-            "measurement": "salon",
-            "fields": {
-                "humidity": round(float(humidity)/100,2),
-            }
-        }
-    ]
-    client.write_points(json_body)
-    loop = 2
+    global humi 
+    humi = humidity
+
 # Callback function for humidity callback
 def cb_temperature(temperature):
     client = InfluxDBClient(host, port, user, password, dbname)
@@ -71,12 +64,12 @@ def cb_temperature(temperature):
         {
             "measurement": "salon",
             "fields": {
-                "temperature": round(float(temperature)/100,2),
+                "temperature": round((float(temperature)/100)+tempComp,2),
+				"humidity": round(float(humi)/100,2),
             }
         }
     ]
-    print('ddfsdsaf')
-    loop = 10
+    loop = 1
     client.write_points(json_body)	
 	
 def main_loop(loop):
@@ -86,7 +79,7 @@ def main_loop(loop):
 	
 if __name__ == "__main__":
     ipcon = IPConnection() # Create IP connection
-    h = BrickletHumidityV2(UID, ipcon) # Create device object
+    h = BrickletHumidityV2(humiUID, ipcon) # Create device object
     ipcon.connect(HOST, PORT) # Connect to brickd
     # Don't use device before ipcon is connected
 
