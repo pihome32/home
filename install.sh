@@ -41,6 +41,8 @@ git pull origin
 cd
 
 pip3 install Pillow
+
+pip install influxdb
  
 sudo apt-get install apt-transport-https curl
 curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
