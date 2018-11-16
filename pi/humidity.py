@@ -12,7 +12,7 @@ HOST = "localhost"
 PORT = 4223
 loop = 10
 
-humiUID = "DeD"
+UID = "DeD"
 
 
 dbname = 'home'
@@ -23,32 +23,22 @@ port=8086
 
 tempComp = -2
 
-	
+
+
 #####################################
+def cb_temperature(temperature):
+    global data_temperature
+    data_temperature=temperature
 
-
-
-if __name__ == "__main__":
-    ipcon = IPConnection() # Create IP connection
-
-    h = BrickletHumidityV2(humiUID, ipcon) # Create device object
-
-    ipcon.connect(HOST, PORT) # Connect to brickd
-    # Don't use device before ipcon is connected
-
-    humi = h.get_humidity()
-    temperature = h.get_temperature()
-
-
-    ipcon.disconnect()
+def cb_humidity(humidity):
     client = InfluxDBClient(host, port, user, password, dbname)
     json_body = [
         {
             "measurement": "data",
             "fields": {
-                "temperature": round((float(temperature)/100)+tempComp,2),
-				"humidity": round(float(humi)/100,2),
-            },
+				"humidity": round((float(humidity)/100),2),
+				"temperature": round((float(data_temperature)/100),2),
+			},
 			"tags": {
 			"node":"server",
 			"location":"salon",
@@ -56,9 +46,26 @@ if __name__ == "__main__":
 			},
         }
     ]
+    print(data_temperature)
 
-    loop = 1
     client.write_points(json_body)	
+
+if __name__ == "__main__":
+    ipcon = IPConnection() # Create IP connection
+    h = BrickletHumidityV2(UID, ipcon) # Create device object
+
+    ipcon.connect(HOST, PORT) # Connect to brickd
+    # Don't use device before ipcon is connected
+
+    # Register humidity callback to function cb_humidity
     
+    h.register_callback(h.CALLBACK_TEMPERATURE, cb_temperature)
+    h.register_callback(h.CALLBACK_HUMIDITY, cb_humidity)
 
-
+    # Set period for humidity callback to 1s (1000ms) without a threshold
+    h.set_temperature_callback_configuration(1000, False, "x", 0, 0)
+    h.set_humidity_callback_configuration(1000, False, "x", 0, 0)
+    while True:
+	    loop += 1
+    raw_input("Press key to exit\n") # Use input() in Python 3
+    ipcon.disconnect()

@@ -21,15 +21,10 @@ from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_air_quality import BrickletAirQuality
 from tinkerforge.bricklet_lcd_128x64 import BrickletLCD128x64
 
+loop = 10
 
-if __name__ == "__main__":
-    ipcon = IPConnection() # Create IP connection
-    aq = BrickletAirQuality(UID, ipcon) # Create device object
-
-    ipcon.connect(HOST, PORT) # Connect to brickd
-    # Don't use device before ipcon is connected
-
-    iaq_index, iaq_index_accuracy, temperature, humidity, air_pressure = aq.get_all_values()
+def cb_all_values(iaq_index, iaq_index_accuracy, temperature, humidity, air_pressure):
+    loop = 10
     # Set period for all values callback to 1s (1000ms)
 
     if iaq_index_accuracy == BrickletAirQuality.ACCURACY_UNRELIABLE:
@@ -61,7 +56,6 @@ if __name__ == "__main__":
     data_humidity=round(float(humidity)/100,2)
 
 	
-    ipcon.disconnect()
     client = InfluxDBClient(host, port, user, password, dbname)
     json_body = [
         {
@@ -88,7 +82,7 @@ if __name__ == "__main__":
 
     ipcon.connect(HOST, PORT) # Connect to brickd
     # Don't use device before ipcon is connected
-    lcd.set_display_configuration(14,80,0,1)
+    lcd.set_display_configuration(14,50,0,1)
    #lcd.reset()    # Clear display
     lcd.clear_display()
 
@@ -99,7 +93,22 @@ if __name__ == "__main__":
     lcd.write_line(6, 0, "Air quality : ")
     lcd.write_line(7, 5, air_quality )
 	
-
-    raw_input("Press key to exit\n") # Use input() in Python 3
     ipcon.disconnect()
 	
+	
+if __name__ == "__main__":
+    ipcon = IPConnection() # Create IP connection
+    aq = BrickletAirQuality(UID, ipcon) # Create device object
+
+    ipcon.connect(HOST, PORT) # Connect to brickd
+    # Don't use device before ipcon is connected
+
+    # Register all values callback to function cb_all_values
+    aq.register_callback(aq.CALLBACK_ALL_VALUES, cb_all_values)
+
+    # Set period for all values callback to 1s (1000ms)
+    aq.set_all_values_callback_configuration(10000, False)
+    while loop> 0:
+	    loop = 10
+
+    ipcon.disconnect()
