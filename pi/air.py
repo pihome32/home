@@ -9,7 +9,7 @@ import os
 HOST = "localhost"
 PORT = 4223
 UID = "GKX" # Change XYZ to the UID of your Air Quality Bricklet
-lcdUID = "GKb" 
+
 
 dbname = 'home'
 user = ''
@@ -19,7 +19,7 @@ port=8086
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_air_quality import BrickletAirQuality
-from tinkerforge.bricklet_lcd_128x64 import BrickletLCD128x64
+
 
 loop = 10
 
@@ -39,17 +39,19 @@ def cb_all_values(iaq_index, iaq_index_accuracy, temperature, humidity, air_pres
     elif iaq_index_accuracy == BrickletAirQuality.ACCURACY_HIGH:
         IAQ_accuracy = 3
         IAQ_accuracy_text = "High"
-
-    if iaq_index < 50:
-        air_quality = "good"
-    elif iaq_index < 100 and iaq_index > 50:
-        air_quality = "average"
-    elif iaq_index < 150 and iaq_index > 100:
-        air_quality = "little bad"	
-    elif iaq_index < 200 and iaq_index > 150:
-        air_quality = "bad"
-    elif iaq_index < 300 and iaq_index > 200:
-        air_quality = "worse"
+    air_quality = "NA"
+    if iaq_index < 51:
+        air_quality = "Good"
+    elif iaq_index < 101 and iaq_index > 50:
+        air_quality = "Moderate"
+    elif iaq_index < 151 and iaq_index > 100:
+        air_quality = "Little bad"	
+    elif iaq_index < 201 and iaq_index > 150:
+        air_quality = "Unhealthy"
+    elif iaq_index < 301 and iaq_index > 200:
+        air_quality = "Very unhealthy"
+    elif iaq_index > 300 :
+        air_quality = "Hazardous"
 		
     data_temperature = round((float(temperature)/100),2)
     data_pressure = round(float(air_pressure)/100,1)
@@ -65,7 +67,9 @@ def cb_all_values(iaq_index, iaq_index_accuracy, temperature, humidity, air_pres
 				"humidity": data_humidity,
 				"pressure": data_pressure,
 				"IAQ_accuracy": IAQ_accuracy,
+				"IAQ_accuracy_text": IAQ_accuracy_text,
 				"IAQ_index": iaq_index,
+				"air_quality": air_quality,
             },
 			"tags": {
 			"node":"server",
@@ -78,22 +82,6 @@ def cb_all_values(iaq_index, iaq_index_accuracy, temperature, humidity, air_pres
     client.write_points(json_body)	
 	
     ipcon = IPConnection() # Create IP connection
-    lcd = BrickletLCD128x64(lcdUID, ipcon) # Create device object
-
-    ipcon.connect(HOST, PORT) # Connect to brickd
-    # Don't use device before ipcon is connected
-    lcd.set_display_configuration(14,50,0,1)
-   #lcd.reset()    # Clear display
-    lcd.clear_display()
-
-    # Write "Hello World" starting from upper left corner of the screen
-    lcd.write_line(0, 0, "Temperature : " + str(data_temperature))
-    lcd.write_line(2, 0, "Humidity : " + str(data_humidity) + "%")
-    lcd.write_line(4, 0, "IAQ : " + str(iaq_index) + " / "+ IAQ_accuracy_text)
-    lcd.write_line(6, 0, "Air quality : ")
-    lcd.write_line(7, 5, air_quality )
-	
-    ipcon.disconnect()
 	
 	
 if __name__ == "__main__":
@@ -109,6 +97,8 @@ if __name__ == "__main__":
     # Set period for all values callback to 1s (1000ms)
     aq.set_all_values_callback_configuration(10000, False)
     while loop> 0:
-	    loop = 10
+	    
+		loop = 10
+		
 
     ipcon.disconnect()
