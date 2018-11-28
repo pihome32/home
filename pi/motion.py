@@ -9,7 +9,7 @@ from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_motion_detector_v2 import BrickletMotionDetectorV2
 
 
-
+loop = 10
 # Callback function for motion detected callback
 def cb_motion_detected():
     client = mqtt.Client()
@@ -20,7 +20,7 @@ def cb_motion_detected():
 # Callback function for detection cycle ended callback
 def cb_detection_cycle_ended():
     print("Detection Cycle Ended (next detection possible in ~2 seconds)")
-
+    loop = 10
 if __name__ == "__main__":
     ipcon = IPConnection() # Create IP connection
     md = BrickletMotionDetectorV2(UID, ipcon) # Create device object
@@ -33,6 +33,7 @@ if __name__ == "__main__":
 
     # Register detection cycle ended callback to function cb_detection_cycle_ended
     md.register_callback(md.CALLBACK_DETECTION_CYCLE_ENDED, cb_detection_cycle_ended)
-
-    raw_input("Press key to exit\n") # Use input() in Python 3
+    while loop> 0:
+	    
+       loop = 10
     ipcon.disconnect()
