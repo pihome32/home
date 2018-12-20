@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from influxdb import InfluxDBClient
 import time
 import os
 
