@@ -33,12 +33,8 @@ bool buzzerON = 0;
 void setup()
 {
   pinMode(LED, OUTPUT);
-<<<<<<< HEAD
   pinMode(buzPin, OUTPUT);
   digitalWrite(buzPin, HIGH);
-=======
-
->>>>>>> 2bde3c6ec60451449ffb7233b7066616aabd910e
   pinMode(RFM95_RST, OUTPUT);
   digitalWrite(RFM95_RST, HIGH);
 
@@ -71,7 +67,6 @@ int counter = 0;
 void loop()
 {
 
-<<<<<<< HEAD
   checkMessage();
   buzzer();
   checkLoraMessage();
@@ -116,9 +111,6 @@ void checkMessage() {
 
 void checkLoraMessage() {
     if (rf95.available())
-=======
-  if (rf95.available())
->>>>>>> 2bde3c6ec60451449ffb7233b7066616aabd910e
   {
     // Should be a message for us now
     uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
@@ -144,7 +136,6 @@ void checkLoraMessage() {
       Serial.println("Receive failed");
     }
   }
-<<<<<<< HEAD
 }
 
 void sendBack(String data) {
@@ -154,6 +145,4 @@ void sendBack(String data) {
   rf95.send((uint8_t *)radiopacket, 100);
   rf95.waitPacketSent();
   rf95.sleep();
-=======
->>>>>>> 2bde3c6ec60451449ffb7233b7066616aabd910e
 }
