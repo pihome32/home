@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import time
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     air.set_status_led_config(0)
     ipcon.disconnect()	
 	
-=======
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from influxdb import InfluxDBClient
@@ -75,7 +75,6 @@ if __name__ == "__main__":
 
     ipcon.connect(HOST, PORT) # Connect to brickd
     # Don't use device before ipcon is connected
-
     master.disable_status_led()
 
   
@@ -87,8 +86,8 @@ if __name__ == "__main__":
     air = BrickletAirQuality(airUID, ipcon) # Create device object
 
     ipcon.connect(HOST, PORT) # Connect to brickd
-    air.set_temperature_offset(2)
+    air.set_temperature_offset(0)
     air.set_status_led_config(0)
     ipcon.disconnect()	
 	
->>>>>>> 5c6d71d02416c231c93a72d5869a10aad7ae104f
+
